@@ -40,6 +40,7 @@ export async function* streamChat(
 
   const decoder = new TextDecoder();
   let buffer = '';
+  let inThinkingTag = false;
 
   while (true) {
     const { done, value } = await reader.read();
@@ -60,18 +61,78 @@ export async function* streamChat(
         const delta = parsed.choices?.[0]?.delta;
         if (!delta) continue;
 
-        // vLLM may return thinking content in reasoning_content field
-        if (delta.reasoning_content) {
-          yield { type: 'thinking', text: delta.reasoning_content };
+        // Debug: log raw delta to console for troubleshooting
+        if (config.enableThinking) {
+          console.log('[vLLM delta]', JSON.stringify(delta));
         }
+
+        // Check dedicated thinking fields (various vLLM / API formats)
+        const thinkingText =
+          delta.reasoning_content ??
+          delta.thinking_content ??
+          delta.reasoning ??
+          delta.thinking;
+
+        if (thinkingText) {
+          yield { type: 'thinking', text: thinkingText };
+        }
+
+        // Check content field — may contain <think>...</think> tags from some models
         if (delta.content) {
-          yield { type: 'content', text: delta.content };
+          const { parts, newInTag } = parseThinkTags(delta.content, inThinkingTag);
+          inThinkingTag = newInTag;
+          for (const part of parts) {
+            yield part;
+          }
         }
       } catch {
         // skip malformed JSON
       }
     }
   }
+}
+
+/**
+ * Parse content that may contain <think>...</think> inline tags.
+ * Some models return thinking wrapped in the content field directly.
+ */
+function parseThinkTags(
+  text: string,
+  inTag: boolean
+): { parts: StreamChunk[]; newInTag: boolean } {
+  const parts: StreamChunk[] = [];
+  let remaining = text;
+  let currentInTag = inTag;
+
+  while (remaining.length > 0) {
+    if (currentInTag) {
+      const endIdx = remaining.indexOf('</think>');
+      if (endIdx === -1) {
+        // Entire remaining text is thinking
+        parts.push({ type: 'thinking', text: remaining });
+        remaining = '';
+      } else {
+        parts.push({ type: 'thinking', text: remaining.slice(0, endIdx) });
+        remaining = remaining.slice(endIdx + 10); //  length
+        currentInTag = false;
+      }
+    } else {
+      const startIdx = remaining.indexOf('<think>');
+      if (startIdx === -1) {
+        // Entire remaining text is content
+        parts.push({ type: 'content', text: remaining });
+        remaining = '';
+      } else {
+        if (startIdx > 0) {
+          parts.push({ type: 'content', text: remaining.slice(0, startIdx) });
+        }
+        remaining = remaining.slice(startIdx + 7); // <think> length
+        currentInTag = true;
+      }
+    }
+  }
+
+  return { parts, newInTag: currentInTag };
 }
 
 export function buildMessages(
