@@ -22,7 +22,7 @@ interface Props {
 
 export default function MessageBubble({ message, streaming }: Props) {
   const ref = useRef<HTMLDivElement>(null);
-  const [thinkingOpen, setThinkingOpen] = useState(false);
+  const [thinkingOpen, setThinkingOpen] = useState(true);
 
   const html =
     message.role === 'assistant'
