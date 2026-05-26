@@ -10,9 +10,11 @@ interface Props {
   onStop: () => void;
   onOpenSettings: () => void;
   sidebarOpen: boolean;
+  enableThinking: boolean;
+  onToggleThinking: () => void;
 }
 
-export default function ChatView({ messages, streaming, onSend, onStop, onOpenSettings, sidebarOpen }: Props) {
+export default function ChatView({ messages, streaming, onSend, onStop, onOpenSettings, sidebarOpen, enableThinking, onToggleThinking }: Props) {
   const listRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -72,7 +74,7 @@ export default function ChatView({ messages, streaming, onSend, onStop, onOpenSe
         )}
       </div>
 
-      <InputArea onSend={onSend} onStop={onStop} streaming={streaming} />
+      <InputArea onSend={onSend} onStop={onStop} streaming={streaming} enableThinking={enableThinking} onToggleThinking={onToggleThinking} />
     </div>
   );
 }

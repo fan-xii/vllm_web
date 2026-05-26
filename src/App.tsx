@@ -42,6 +42,8 @@ export default function App() {
         onStop={stopStreaming}
         onOpenSettings={() => setSettingsOpen(true)}
         sidebarOpen={sidebarOpen}
+        enableThinking={config.enableThinking}
+        onToggleThinking={() => setConfig({ ...config, enableThinking: !config.enableThinking })}
       />
       {settingsOpen && (
         <SettingsModal

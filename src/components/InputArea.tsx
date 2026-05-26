@@ -5,9 +5,11 @@ interface Props {
   onSend: (content: string) => void;
   onStop: () => void;
   streaming: boolean;
+  enableThinking: boolean;
+  onToggleThinking: () => void;
 }
 
-export default function InputArea({ onSend, onStop, streaming }: Props) {
+export default function InputArea({ onSend, onStop, streaming, enableThinking, onToggleThinking }: Props) {
   const [input, setInput] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -64,8 +66,19 @@ export default function InputArea({ onSend, onStop, streaming }: Props) {
           )}
         </button>
       </div>
-      <div className="input-hint">
-        Powered by vLLM &middot; MiniMax-M2.7
+      <div className="input-toolbar">
+        <button
+          className={`thinking-btn ${enableThinking ? 'active' : ''}`}
+          onClick={onToggleThinking}
+          title={enableThinking ? 'Disable thinking mode' : 'Enable thinking mode'}
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M12 2a7 7 0 017 7c0 2.38-1.19 4.47-3 5.74V17a1 1 0 01-1 1h-6a1 1 0 01-1-1v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 017-7z" />
+            <line x1="9" y1="21" x2="15" y2="21" />
+            <line x1="10" y1="24" x2="14" y2="24" />
+          </svg>
+          <span>Think</span>
+        </button>
       </div>
     </div>
   );

@@ -98,19 +98,6 @@ export default function SettingsModal({ config, onSave, onClose }: Props) {
             />
           </div>
 
-          <div className="form-group toggle-group">
-            <div>
-              <label>Thinking Mode</label>
-              <p className="form-hint">Enable chain-of-thought reasoning (requires model support)</p>
-            </div>
-            <button
-              type="button"
-              className={`toggle ${form.enableThinking ? 'on' : ''}`}
-              onClick={() => update('enableThinking', !form.enableThinking)}
-            >
-              <span className="toggle-knob" />
-            </button>
-          </div>
         </div>
 
         <div className="modal-footer">
