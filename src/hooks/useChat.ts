@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import type { Message, Conversation, ApiConfig } from '../types';
 import { DEFAULT_CONFIG } from '../types';
 import { streamChat, buildMessages } from '../api';
@@ -32,6 +32,10 @@ export function useChat() {
   const abortRef = useRef<AbortController | null>(null);
 
   const activeConv = conversations.find((c) => c.id === activeId) || null;
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = config.theme;
+  }, [config.theme]);
 
   const saveConversations = useCallback((convs: Conversation[]) => {
     setConversations(convs);

@@ -14,6 +14,8 @@ export interface Conversation {
   updatedAt: number;
 }
 
+export type Theme = 'dark' | 'light' | 'midnight' | 'dracula';
+
 export interface ApiConfig {
   baseUrl: string;
   model: string;
@@ -22,6 +24,7 @@ export interface ApiConfig {
   maxTokens: number;
   systemPrompt: string;
   enableThinking: boolean;
+  theme: Theme;
 }
 
 export const DEFAULT_CONFIG: ApiConfig = {
@@ -32,4 +35,5 @@ export const DEFAULT_CONFIG: ApiConfig = {
   maxTokens: 4096,
   systemPrompt: 'You are a helpful assistant.',
   enableThinking: false,
+  theme: 'dark',
 };

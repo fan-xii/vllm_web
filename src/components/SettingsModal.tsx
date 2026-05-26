@@ -1,11 +1,18 @@
 import { useState } from 'react';
-import type { ApiConfig } from '../types';
+import type { ApiConfig, Theme } from '../types';
 
 interface Props {
   config: ApiConfig;
   onSave: (config: ApiConfig) => void;
   onClose: () => void;
 }
+
+const THEMES: { id: Theme; label: string; colors: string[] }[] = [
+  { id: 'dark', label: 'Dark', colors: ['#212121', '#171717', '#10a37f'] },
+  { id: 'light', label: 'Light', colors: ['#ffffff', '#f7f7f8', '#10a37f'] },
+  { id: 'midnight', label: 'Midnight', colors: ['#0d1117', '#010409', '#58a6ff'] },
+  { id: 'dracula', label: 'Dracula', colors: ['#282a36', '#21222c', '#50fa7b'] },
+];
 
 export default function SettingsModal({ config, onSave, onClose }: Props) {
   const [form, setForm] = useState({ ...config });
@@ -33,6 +40,26 @@ export default function SettingsModal({ config, onSave, onClose }: Props) {
         </div>
 
         <div className="modal-body">
+          <div className="form-group">
+            <label>Theme</label>
+            <div className="theme-grid">
+              {THEMES.map((t) => (
+                <button
+                  key={t.id}
+                  className={`theme-swatch ${form.theme === t.id ? 'active' : ''}`}
+                  onClick={() => update('theme', t.id)}
+                >
+                  <div className="theme-preview">
+                    <div style={{ background: t.colors[0] }} />
+                    <div style={{ background: t.colors[1] }} />
+                    <div style={{ background: t.colors[2] }} />
+                  </div>
+                  <span>{t.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
           <div className="form-group">
             <label>Base URL</label>
             <input

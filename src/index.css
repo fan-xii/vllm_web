@@ -1,5 +1,16 @@
 /* ===== CSS Variables ===== */
 :root {
+  --radius: 12px;
+  --radius-sm: 8px;
+  --sidebar-width: 260px;
+  --header-height: 56px;
+  --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+  --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+}
+
+/* Dark (default) */
+:root,
+[data-theme="dark"] {
   --bg-primary: #212121;
   --bg-secondary: #171717;
   --bg-tertiary: #2f2f2f;
@@ -16,12 +27,74 @@
   --danger: #ef4444;
   --danger-hover: #dc2626;
   --shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  --radius: 12px;
-  --radius-sm: 8px;
-  --sidebar-width: 260px;
-  --header-height: 56px;
-  --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
-  --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  --user-avatar-bg: #5b6ecc;
+  --code-bg: #1e1e1e;
+}
+
+/* Light */
+[data-theme="light"] {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f7f7f8;
+  --bg-tertiary: #ececec;
+  --bg-input: #ffffff;
+  --bg-hover: #e8e8e8;
+  --bg-message-user: #f0f0f0;
+  --bg-message-assistant: transparent;
+  --text-primary: #1a1a1a;
+  --text-secondary: #555555;
+  --text-muted: #999999;
+  --border: #e0e0e0;
+  --accent: #10a37f;
+  --accent-hover: #0d8c6d;
+  --danger: #ef4444;
+  --danger-hover: #dc2626;
+  --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --user-avatar-bg: #5b6ecc;
+  --code-bg: #f6f6f6;
+}
+
+/* Midnight */
+[data-theme="midnight"] {
+  --bg-primary: #0d1117;
+  --bg-secondary: #010409;
+  --bg-tertiary: #161b22;
+  --bg-input: #0d1117;
+  --bg-hover: #1c2128;
+  --bg-message-user: #161b22;
+  --bg-message-assistant: transparent;
+  --text-primary: #e6edf3;
+  --text-secondary: #8b949e;
+  --text-muted: #6e7681;
+  --border: #30363d;
+  --accent: #58a6ff;
+  --accent-hover: #388bfd;
+  --danger: #f85149;
+  --danger-hover: #da3633;
+  --shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --user-avatar-bg: #1f6feb;
+  --code-bg: #161b22;
+}
+
+/* Dracula */
+[data-theme="dracula"] {
+  --bg-primary: #282a36;
+  --bg-secondary: #21222c;
+  --bg-tertiary: #343746;
+  --bg-input: #282a36;
+  --bg-hover: #3e4155;
+  --bg-message-user: #343746;
+  --bg-message-assistant: transparent;
+  --text-primary: #f8f8f2;
+  --text-secondary: #bfbfbf;
+  --text-muted: #6272a4;
+  --border: #44475a;
+  --accent: #50fa7b;
+  --accent-hover: #3bd15e;
+  --danger: #ff5555;
+  --danger-hover: #ff3333;
+  --shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --user-avatar-bg: #bd93f9;
+  --code-bg: #282a36;
 }
 
 /* ===== Reset ===== */
@@ -386,7 +459,7 @@ body {
 }
 
 .message.user .message-avatar {
-  background: #5b6ecc;
+  background: var(--user-avatar-bg);
   color: white;
 }
 
@@ -458,7 +531,7 @@ body {
 }
 
 .message-content pre {
-  background: #1e1e1e;
+  background: var(--code-bg);
   border-radius: var(--radius-sm);
   padding: 16px;
   overflow-x: auto;
@@ -807,6 +880,51 @@ body {
   color: var(--text-primary);
 }
 
+/* ===== Theme Swatches ===== */
+.theme-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.theme-swatch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 8px;
+  background: var(--bg-tertiary);
+  border: 2px solid transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s;
+  color: var(--text-secondary);
+  font-family: var(--font);
+  font-size: 12px;
+}
+
+.theme-swatch:hover {
+  border-color: var(--text-muted);
+}
+
+.theme-swatch.active {
+  border-color: var(--accent);
+  background: var(--bg-hover);
+}
+
+.theme-preview {
+  display: flex;
+  gap: 3px;
+  width: 100%;
+}
+
+.theme-preview div {
+  flex: 1;
+  height: 24px;
+  border-radius: 4px;
+  border: 1px solid rgba(128, 128, 128, 0.2);
+}
+
 /* ===== Toggle Switch ===== */
 .toggle-group {
   flex-direction: row !important;
@@ -944,7 +1062,7 @@ body {
 }
 
 .thinking-content pre {
-  background: #1e1e1e;
+  background: var(--code-bg);
   border-radius: var(--radius-sm);
   padding: 12px;
   overflow-x: auto;
