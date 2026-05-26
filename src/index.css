@@ -403,6 +403,7 @@ body {
 .message-body {
   flex: 1;
   min-width: 0;
+  overflow: hidden;
 }
 
 .message-role {
@@ -908,9 +909,12 @@ body {
   max-height: 2000px;
   padding: 12px;
   border-top: 1px solid var(--border);
-  overflow-x: hidden;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
+  overflow: hidden;
+}
+
+.thinking-content * {
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .thinking-content p {
@@ -918,6 +922,8 @@ body {
   font-size: 13px;
   color: var(--text-muted);
   line-height: 1.6;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .thinking-content p:last-child {
