@@ -17,6 +17,9 @@ renderer.code = function ({ text, lang }: { text: string; lang?: string }) {
   return `<pre><code class="hljs language-${language}">${highlighted}</code></pre>`;
 };
 
+// Helper: check if text looks like LaTeX (contains \command patterns)
+const LATEX_CMD = /\\[a-zA-Z]+/;
+
 // Extension to handle LaTeX math before marked processes the text
 function renderMathInText(text: string): string {
   // Block math: $$...$$
@@ -27,12 +30,46 @@ function renderMathInText(text: string): string {
       return `<pre>${math}</pre>`;
     }
   });
+  // Block math: \[...\]
+  text = text.replace(/\\\[([\s\S]+?)\\\]/g, (_, math) => {
+    try {
+      return katex.renderToString(math.trim(), { displayMode: true, throwOnError: false });
+    } catch {
+      return `<pre>${math}</pre>`;
+    }
+  });
+  // Block math: [ ... ] containing LaTeX commands (model outputs like [\hat A = ...])
+  text = text.replace(/\[([^\]]{3,})\]/g, (match, math) => {
+    if (!LATEX_CMD.test(math)) return match;
+    try {
+      return katex.renderToString(math.trim(), { displayMode: true, throwOnError: false });
+    } catch {
+      return match;
+    }
+  });
   // Inline math: $...$  (but not $$ and not \$)
   text = text.replace(/(?<!\$)\$(?!\$)(.+?)(?<!\$)\$(?!\$)/g, (_, math) => {
     try {
       return katex.renderToString(math.trim(), { displayMode: false, throwOnError: false });
     } catch {
       return `<code>${math}</code>`;
+    }
+  });
+  // Inline math: \(...\)
+  text = text.replace(/\\\((.+?)\\\)/g, (_, math) => {
+    try {
+      return katex.renderToString(math.trim(), { displayMode: false, throwOnError: false });
+    } catch {
+      return `<code>${math}</code>`;
+    }
+  });
+  // Inline math: ( ... ) containing LaTeX commands (model outputs like ( \hat A))
+  text = text.replace(/\(([^()]{3,})\)/g, (match, math) => {
+    if (!LATEX_CMD.test(math)) return match;
+    try {
+      return katex.renderToString(math.trim(), { displayMode: false, throwOnError: false });
+    } catch {
+      return match;
     }
   });
   return text;
