@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { marked } from 'marked';
 import hljs from 'highlight.js';
 import type { Message } from '../types';
@@ -22,11 +22,17 @@ interface Props {
 
 export default function MessageBubble({ message, streaming }: Props) {
   const ref = useRef<HTMLDivElement>(null);
+  const [thinkingOpen, setThinkingOpen] = useState(false);
 
   const html =
     message.role === 'assistant'
       ? marked.parse(message.content || (streaming ? '...' : ''), { renderer }) as string
       : escapeHtml(message.content);
+
+  const thinkingHtml =
+    message.thinking
+      ? marked.parse(message.thinking, { renderer }) as string
+      : '';
 
   useEffect(() => {
     if (ref.current) {
@@ -34,7 +40,7 @@ export default function MessageBubble({ message, streaming }: Props) {
         hljs.highlightElement(block as HTMLElement);
       });
     }
-  }, [message.content]);
+  }, [message.content, message.thinking]);
 
   return (
     <div className={`message ${message.role}`} ref={ref}>
@@ -53,8 +59,23 @@ export default function MessageBubble({ message, streaming }: Props) {
       </div>
       <div className="message-body">
         <div className="message-role">{message.role === 'user' ? 'You' : 'MiniMax'}</div>
+
+        {message.thinking && (
+          <div className={`thinking-block ${thinkingOpen ? 'open' : ''}`}>
+            <button className="thinking-toggle" onClick={() => setThinkingOpen(!thinkingOpen)}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+              <span>{streaming ? 'Thinking...' : 'Thinking process'}</span>
+            </button>
+            <div className="thinking-content">
+              <div dangerouslySetInnerHTML={{ __html: thinkingHtml }} />
+            </div>
+          </div>
+        )}
+
         <div
-          className={`message-content ${streaming && message.role === 'assistant' && !message.content ? 'loading' : ''}`}
+          className={`message-content ${streaming && message.role === 'assistant' && !message.content && !message.thinking ? 'loading' : ''}`}
           dangerouslySetInnerHTML={{ __html: html }}
         />
         {streaming && message.role === 'assistant' && message.content && (

@@ -10,7 +10,7 @@ interface Props {
 export default function SettingsModal({ config, onSave, onClose }: Props) {
   const [form, setForm] = useState({ ...config });
 
-  const update = (key: keyof ApiConfig, value: string | number) => {
+  const update = (key: keyof ApiConfig, value: string | number | boolean) => {
     setForm((prev) => ({ ...prev, [key]: value }));
   };
 
@@ -96,6 +96,20 @@ export default function SettingsModal({ config, onSave, onClose }: Props) {
               rows={3}
               placeholder="You are a helpful assistant."
             />
+          </div>
+
+          <div className="form-group toggle-group">
+            <div>
+              <label>Thinking Mode</label>
+              <p className="form-hint">Enable chain-of-thought reasoning (requires model support)</p>
+            </div>
+            <button
+              type="button"
+              className={`toggle ${form.enableThinking ? 'on' : ''}`}
+              onClick={() => update('enableThinking', !form.enableThinking)}
+            >
+              <span className="toggle-knob" />
+            </button>
           </div>
         </div>
 

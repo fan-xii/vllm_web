@@ -119,14 +119,21 @@ export function useChat() {
         const stream = streamChat(config, apiMessages);
 
         let fullContent = '';
+        let fullThinking = '';
         for await (const chunk of stream) {
-          fullContent += chunk;
+          if (chunk.type === 'thinking') {
+            fullThinking += chunk.text;
+          } else {
+            fullContent += chunk.text;
+          }
           const updatedConvs = convs.map((c) => {
             if (c.id !== convId) return c;
             return {
               ...c,
               messages: c.messages.map((m) =>
-                m.id === assistantMsg.id ? { ...m, content: fullContent } : m
+                m.id === assistantMsg.id
+                  ? { ...m, content: fullContent, thinking: fullThinking || undefined }
+                  : m
               ),
             };
           });

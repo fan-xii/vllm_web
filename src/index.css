@@ -771,6 +771,135 @@ body {
   color: var(--text-primary);
 }
 
+/* ===== Toggle Switch ===== */
+.toggle-group {
+  flex-direction: row !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.toggle-group label {
+  margin-bottom: 0;
+}
+
+.form-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin: 0;
+  grid-column: 1;
+}
+
+.toggle {
+  width: 44px;
+  height: 24px;
+  border-radius: 12px;
+  border: none;
+  background: var(--border);
+  cursor: pointer;
+  position: relative;
+  transition: background 0.2s;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.toggle.on {
+  background: var(--accent);
+}
+
+.toggle-knob {
+  display: block;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: white;
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  transition: transform 0.2s;
+}
+
+.toggle.on .toggle-knob {
+  transform: translateX(20px);
+}
+
+/* ===== Thinking Block ===== */
+.thinking-block {
+  margin-bottom: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.thinking-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 8px 12px;
+  background: var(--bg-tertiary);
+  border: none;
+  color: var(--text-muted);
+  font-family: var(--font);
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.thinking-toggle:hover {
+  background: var(--bg-hover);
+  color: var(--text-secondary);
+}
+
+.thinking-toggle svg {
+  width: 14px;
+  height: 14px;
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+
+.thinking-block.open .thinking-toggle svg {
+  transform: rotate(90deg);
+}
+
+.thinking-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  padding: 0 12px;
+}
+
+.thinking-block.open .thinking-content {
+  max-height: 2000px;
+  padding: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.thinking-content p {
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.thinking-content p:last-child {
+  margin-bottom: 0;
+}
+
+.thinking-content pre {
+  background: #1e1e1e;
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  overflow-x: auto;
+  margin: 8px 0;
+  border: 1px solid var(--border);
+}
+
+.thinking-content code {
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
 /* ===== Highlight.js Override ===== */
 .hljs {
   background: transparent !important;

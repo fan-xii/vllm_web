@@ -13,6 +13,7 @@ A sleek, ChatGPT-style web interface for chatting with models served by [vLLM](h
 - **Conversation Management** — Create, switch, and delete conversations from the sidebar; all data persisted in localStorage
 - **Markdown Rendering** — Full support for code blocks (with syntax highlighting), tables, lists, blockquotes, and more
 - **Configurable Settings** — Adjust base URL, model path, temperature, max tokens, and system prompt via the settings panel
+- **Thinking Mode** — Optional chain-of-thought reasoning toggle for supported models, with collapsible thinking process display
 - **Dark Theme** — Clean, modern dark UI inspired by leading chat interfaces
 - **Responsive Design** — Works on both desktop and mobile
 

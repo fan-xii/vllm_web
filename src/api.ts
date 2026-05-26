@@ -1,22 +1,33 @@
 import type { ApiConfig, Message } from './types';
 
+export interface StreamChunk {
+  type: 'thinking' | 'content';
+  text: string;
+}
+
 export async function* streamChat(
   config: ApiConfig,
   messages: { role: string; content: string }[]
-): AsyncGenerator<string, void, unknown> {
+): AsyncGenerator<StreamChunk, void, unknown> {
+  const body: Record<string, unknown> = {
+    model: config.model,
+    messages,
+    stream: true,
+    temperature: config.temperature,
+    max_tokens: config.maxTokens,
+  };
+
+  if (config.enableThinking) {
+    body.enable_thinking = true;
+  }
+
   const response = await fetch(`${config.baseUrl}/chat/completions`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${config.apiKey}`,
     },
-    body: JSON.stringify({
-      model: config.model,
-      messages,
-      stream: true,
-      temperature: config.temperature,
-      max_tokens: config.maxTokens,
-    }),
+    body: JSON.stringify(body),
   });
 
   if (!response.ok) {
@@ -46,8 +57,16 @@ export async function* streamChat(
 
       try {
         const parsed = JSON.parse(data);
-        const content = parsed.choices?.[0]?.delta?.content;
-        if (content) yield content;
+        const delta = parsed.choices?.[0]?.delta;
+        if (!delta) continue;
+
+        // vLLM may return thinking content in reasoning_content field
+        if (delta.reasoning_content) {
+          yield { type: 'thinking', text: delta.reasoning_content };
+        }
+        if (delta.content) {
+          yield { type: 'content', text: delta.content };
+        }
       } catch {
         // skip malformed JSON
       }
