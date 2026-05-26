@@ -930,6 +930,19 @@ body {
   margin-bottom: 0;
 }
 
+.thinking-content ul,
+.thinking-content ol {
+  margin: 8px 0;
+  padding-left: 24px;
+  list-style-position: inside;
+}
+
+.thinking-content li {
+  margin-bottom: 4px;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
 .thinking-content pre {
   background: #1e1e1e;
   border-radius: var(--radius-sm);
