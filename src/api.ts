@@ -61,28 +61,29 @@ export async function* streamChat(
         const delta = parsed.choices?.[0]?.delta;
         if (!delta) continue;
 
-        // Debug: log raw delta to console for troubleshooting
+        // Only process thinking content when thinking mode is enabled
         if (config.enableThinking) {
-          console.log('[vLLM delta]', JSON.stringify(delta));
+          const thinkingText =
+            delta.reasoning_content ??
+            delta.thinking_content ??
+            delta.reasoning ??
+            delta.thinking;
+
+          if (thinkingText) {
+            yield { type: 'thinking', text: thinkingText };
+          }
         }
 
-        // Check dedicated thinking fields (various vLLM / API formats)
-        const thinkingText =
-          delta.reasoning_content ??
-          delta.thinking_content ??
-          delta.reasoning ??
-          delta.thinking;
-
-        if (thinkingText) {
-          yield { type: 'thinking', text: thinkingText };
-        }
-
-        // Check content field — may contain <think>...</think> tags from some models
         if (delta.content) {
-          const { parts, newInTag } = parseThinkTags(delta.content, inThinkingTag);
-          inThinkingTag = newInTag;
-          for (const part of parts) {
-            yield part;
+          if (config.enableThinking) {
+            // Parse inline <think>...</think> tags when thinking is on
+            const { parts, newInTag } = parseThinkTags(delta.content, inThinkingTag);
+            inThinkingTag = newInTag;
+            for (const part of parts) {
+              yield part;
+            }
+          } else {
+            yield { type: 'content', text: delta.content };
           }
         }
       } catch {
