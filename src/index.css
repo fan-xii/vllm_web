@@ -908,6 +908,9 @@ body {
   max-height: 2000px;
   padding: 12px;
   border-top: 1px solid var(--border);
+  overflow-x: hidden;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .thinking-content p {
@@ -933,6 +936,28 @@ body {
 .thinking-content code {
   font-family: var(--font-mono);
   font-size: 12px;
+}
+
+/* ===== KaTeX Math Styles ===== */
+.message-content .katex-display {
+  margin: 16px 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 8px 0;
+}
+
+.message-content .katex {
+  font-size: 1.05em;
+}
+
+.thinking-content .katex-display {
+  margin: 8px 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.thinking-content .katex {
+  font-size: 0.95em;
 }
 
 /* ===== Highlight.js Override ===== */

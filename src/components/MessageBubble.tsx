@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { marked } from 'marked';
 import hljs from 'highlight.js';
+import katex from 'katex';
 import type { Message } from '../types';
 
 marked.setOptions({
@@ -8,12 +9,39 @@ marked.setOptions({
   breaks: true,
 });
 
+// Custom renderer for code blocks
 const renderer = new marked.Renderer();
 renderer.code = function ({ text, lang }: { text: string; lang?: string }) {
   const language = lang && hljs.getLanguage(lang) ? lang : 'plaintext';
   const highlighted = hljs.highlight(text, { language }).value;
   return `<pre><code class="hljs language-${language}">${highlighted}</code></pre>`;
 };
+
+// Extension to handle LaTeX math before marked processes the text
+function renderMathInText(text: string): string {
+  // Block math: $$...$$
+  text = text.replace(/\$\$([\s\S]+?)\$\$/g, (_, math) => {
+    try {
+      return katex.renderToString(math.trim(), { displayMode: true, throwOnError: false });
+    } catch {
+      return `<pre>${math}</pre>`;
+    }
+  });
+  // Inline math: $...$  (but not $$ and not \$)
+  text = text.replace(/(?<!\$)\$(?!\$)(.+?)(?<!\$)\$(?!\$)/g, (_, math) => {
+    try {
+      return katex.renderToString(math.trim(), { displayMode: false, throwOnError: false });
+    } catch {
+      return `<code>${math}</code>`;
+    }
+  });
+  return text;
+}
+
+function renderContent(text: string): string {
+  const withMath = renderMathInText(text);
+  return marked.parse(withMath, { renderer }) as string;
+}
 
 interface Props {
   message: Message;
@@ -23,15 +51,24 @@ interface Props {
 export default function MessageBubble({ message, streaming }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const [thinkingOpen, setThinkingOpen] = useState(true);
+  const prevContentRef = useRef(message.content);
+
+  // Auto-collapse thinking when content starts arriving
+  useEffect(() => {
+    if (streaming && message.thinking && !prevContentRef.current && message.content) {
+      setThinkingOpen(false);
+    }
+    prevContentRef.current = message.content;
+  }, [message.content, message.thinking, streaming]);
 
   const html =
     message.role === 'assistant'
-      ? marked.parse(message.content || (streaming ? '...' : ''), { renderer }) as string
+      ? renderContent(message.content || (streaming ? '...' : ''))
       : escapeHtml(message.content);
 
   const thinkingHtml =
     message.thinking
-      ? marked.parse(message.thinking, { renderer }) as string
+      ? renderContent(message.thinking)
       : '';
 
   useEffect(() => {
@@ -66,7 +103,7 @@ export default function MessageBubble({ message, streaming }: Props) {
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <polyline points="9 18 15 12 9 6" />
               </svg>
-              <span>{streaming ? 'Thinking...' : 'Thinking process'}</span>
+              <span>{streaming && thinkingOpen ? 'Thinking...' : 'Thinking process'}</span>
             </button>
             <div className="thinking-content">
               <div dangerouslySetInnerHTML={{ __html: thinkingHtml }} />
